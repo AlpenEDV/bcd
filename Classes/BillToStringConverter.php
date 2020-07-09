@@ -21,7 +21,7 @@ class BillToStringConverter {
     
     public function setAmount($amount){
         if(empty($amount)){
-            //TODO: Write New Exception
+            //TODO: Write New Exception Names
         throw new WrongCurrencyFormatException("Currency is not allowed to be empty");
         } else{
             $this->amount= $amount;
@@ -44,7 +44,7 @@ class BillToStringConverter {
     public function getFormatedString(){
         $var="";
         if(empty($this->paymentReference)&&empty($this->reasonForPayment)){
-            //TODO: Error Handeling;
+            //TODO: Error Handeling; if both are empty
         }
         if(empty($this->paymentReference)){
             $var= $this->amount."Lf".$this->reasonForPayment;
@@ -56,7 +56,7 @@ class BillToStringConverter {
         if(mb_strlen($var, $this->codierung[$this->versionNumber])<=331){
             return $var;
         }else {
-            //TODO: Error Handeling;
+            //TODO: Error Handeling; if the byte is geater then 331 Byte
         }
     }
     

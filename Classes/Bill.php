@@ -49,7 +49,7 @@ class Bill {
                 $this->bankIdentifierCode=$bic;
                 return;
             }else if(empty ($bic)){
-                throw new WrongTextFormatException($bic.'Bank Identifer Code is Not allowed to be empty in Version 001 current version'.$this->version);
+                throw new WrongTextFormatException($bic.'Bank Identifer Code is Not allowed to be empty in Version 001 current version '.$this->version);
             }else if($this->version=="001"){
                 $this->bankIdentifierCode=$bic;
             }
