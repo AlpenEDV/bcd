@@ -6,13 +6,17 @@
  * and open the template in the editor.
  */
 
+namespace Alpenedv\Tools\Bcd\Exception;
+
+use Exception;
+
 /**
  * Description of WrongNumberExcetion
  *
  * @author eduard
  */
-class WrongNumberExcetion extends Exception{
+class WrongNumberException extends Exception{
      public function Message(){
-        return $errorMsg= 'Error: The Decoding Number '.$this->getMessage().'is not vaild; (either is greater then 8 or lower then 1 or is not a number)';
+        return $errorMsg= 'Error: The Decoding Number '.$this->getMessage().'is not valid; (either is greater then 8 or lower then 1 or is not a number)';
     }
 }

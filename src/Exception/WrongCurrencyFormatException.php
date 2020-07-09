@@ -6,13 +6,17 @@
  * and open the template in the editor.
  */
 
+namespace Alpenedv\Tools\Bcd\Exception;
+
+use Exception;
+
 /**
- * Description of WrongTextFormatException
+ * Description of WrongCurrencyFormatException
  *
  * @author eduard
  */
-class WrongTextFormatException extends Exception{
-     public function Message(){
+class WrongCurrencyFormatException extends Exception{
+    public function Message(){
         return $errorMsg=$this->getMessage();
     }
 }

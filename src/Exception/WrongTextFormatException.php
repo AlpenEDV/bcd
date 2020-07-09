@@ -6,13 +6,17 @@
  * and open the template in the editor.
  */
 
+namespace Alpenedv\Tools\Bcd\Exception;
+
+use Exception;
+
 /**
- * Description of WrongVersionException
+ * Description of WrongTextFormatException
  *
  * @author eduard
  */
-class WrongVersionException extends Exception{
-    public function Message(){
-        return $errorMsg= 'Error the Version Number '.$this->getMessage().'is not vaild';
+class WrongTextFormatException extends Exception{
+     public function Message(){
+        return $errorMsg=$this->getMessage();
     }
 }
