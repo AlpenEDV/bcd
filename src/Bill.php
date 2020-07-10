@@ -1,12 +1,14 @@
 <?php
 
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * BCD -Payment Qr Code Generation
+ *
+ * @copyright (c) AlpenEDV
+ * @author Eduard Duanreanu <eduard@alpenedv.at>
  */
 
 namespace Alpenedv\Tools\Bcd;
+
 use Alpenedv\Tools\Bcd\Exception\WrongCurrencyFormatException;
 use Alpenedv\Tools\Bcd\Exception\WrongNumberException;
 use Alpenedv\Tools\Bcd\Exception\WrongTextFormatException;
@@ -17,13 +19,14 @@ use Alpenedv\Tools\Bcd\Exception\WrongVersionException;
  *
  * @author eduard
  */
-class Bill {
+class Bill
+{
+    public const VERSION_1 = '001';
+    public const VERSION_2 = '002';
+    public const SCT = 'SCT';
+    public const ENCODING_UTF8 = 1;
     
-    const VERSION_1 = '001';
-    const VERSION_2 = '002';
-    
-    const ENCODING_UTF8 = 1;
-    //exception werfen wenn nicht utf8 is    
+    //exception werfen wenn nicht utf8 is
     private $version;
     private $decodingNumber;
     private $creditTransferMethod;
@@ -34,119 +37,183 @@ class Bill {
     private $paymentReference;
     private $reasonForPayment;
     
-    //check if length is the same aas in the docu 5
     // <editor-fold defaultstate="collapsed" desc="Setter">
-        public function setVersion($version){
-            if($version === self::VERSION_1 || $version === self::VERSION_2){
-                $this->version=$version;
-            }else {
-                throw new WrongVersionException($version);
-            }
+   //mb_strln == zeichen   strln=byte
+    //TODO: CodeSytle PSR-12;
+    public function setVersion(string $version)
+    {
+        if ($version === self::VERSION_1 || $version === self::VERSION_2) {
+            $this->version = $version;
+        } else {
+            throw new WrongVersionException($version);
         }
-        public function setDecodingNumber($decodingNumber){
-            if($decodingNumber>0&&$decodingNumber<9){
-                $this->decodingNumber=$decodingNumber;
-            }else{
-                throw new WrongNumberException($decodingNumber);
-            }
+        return $this;
+    }
+    public function setDecodingNumber(int $decodingNumber)
+    {
+        if ($decodingNumber != 1) {
+            throw new WrongNumberException($decodingNumber);
         }
-        public function setCreditTransferMethod(string $creditTransferMethod) {
-            if($creditTransferMethod=="SCT"||$creditTransferMethod=="SEPA"){
-                $this->creditTransferMethod=$creditTransferMethod;
-            }else{
-                throw new WrongTextFormatException($creditTransferMethod.' is not a vaild TransferMethod;');
-            }
-            
-            return $this;
-        }
-        public function setBankIdentiferCode($bic){
-            if($this->version=="002"&&!empty($bic)){
-                $this->bankIdentifierCode=$bic;
-                return;
-            }else if(empty ($bic)){
-                throw new WrongTextFormatException($bic.'Bank Identifer Code is Not allowed to be empty in Version 001 current version '.$this->version);
-            }else if($this->version=="001"){
-                $this->bankIdentifierCode=$bic;
-            }
-        }
-        public function setRecieverName($name){
-            if(!empty($name)){
-            $this->recieverName=$name;
-            }
-        }
-        public function setIban(){
-            // TODO: Mit Andi Die Lib verwenden
-        }
-        public function setAmount($amount){
-            $value= substr($amount, 3);
-            //Here is the check if it has a "," seperator or a currency seperator
-            if(!is_numeric($value)){
-                 throw new WrongCurrencyFormatException("Error: The Currency is not right or it has the wrong seperator use this seperator: .");
-            }
+        $this->decodingNumber = $decodingNumber;
 
-            //NOT ALLOWED .0 .12 ...
-            if($value[0]==".")
-            {
-                throw new WrongCurrencyFormatException("Error: Leading zero is required for amounts below 1 EUR.");
-            }
-            //NOT ALLOWED 00123.3 01.223 00000011 ....
-            if($value[0]==0&&$value[1]!='.'){
-                throw new WrongCurrencyFormatException("Error: There are no Zeros allowed Before the Euro Index");
-            }
-            //NOT ALLOWED 123.30 45.0
-            if(strpos($value, '.')===true && $value[strlen($value)]==0){
-                throw new WrongCurrencyFormatException("Error: There are no Zeros allowed at the end at The Currency");
-            }
-            
-            if ($value <= 0) {
-                throw new WrongCurrencyFormatException("Error: Currency Amount is too low");
-            }
-            
-            if($value>999999999.99){
-                throw new WrongCurrencyFormatException("Error: Currency Amount is greater as 999 999 999,99 Euro");
-            }
-            $this->amount =$amount;
+        return $this;
+    }
+    public function setCreditTransferMethod(string $creditTransferMethod)
+    {
+        if ($creditTransferMethod == self::SCT) {
+            $this->creditTransferMethod = $creditTransferMethod;
+        } else {
+            throw new WrongTextFormatException($creditTransferMethod . ' is not a vaild TransferMethod;');
         }
-        public function setPaymentReference($ref){
-            if(!empty($ref)){
-                //TODO: Andi Fragen ob nicht pR mandatory sein sollte
-               $this->paymentReference=$ref;
-            }
+
+        return $this;
+    }
+    public function setBankIdentiferCode(string $bic)
+    {
+        if (strlen($bic) != 8 && strlen($bic) != 11) {
+            throw new WrongTextFormatException("Bank Identifier Code is not 8 Byte long or 11 Byte long.");
         }
-        public function setReasonForPayment($rfp){
-            if(!empty($rfp)){
-                $this->reasonForPayment=$rfp;
-            }
+        if (is_null($this->version)) {
+            throw new WrongTextFormatException("Before setting the Bank Identifier Code please set the Verisonnumber.");
         }
+        if ($this->version === self::VERSION_2 && !empty($bic)) {
+            $this->bankIdentifierCode = $bic;
+            return;
+        } elseif (empty($bic)) {
+            throw new WrongTextFormatException($bic
+                    . 'Bank Identifer Code is Not allowed to be empty in Version 001 current version' . $this->version);
+        }
+            $this->bankIdentifierCode = $bic;
+        return $this;
+    }
+    public function setRecieverName(string $name)
+    {
+        if (empty($name)) {
+            throw new WrongTextFormatException("Error: The Reciever Name is not allowed to be empty.");
+        }
+        if (mb_strlen($name) > 70) {
+            throw new WrongTextFormatException("Error: The Reciever Name is not allowed to be geater then 70 chars.");
+        }
+
+        $this->recieverName = $name;
+        return $this;
+    }
+    public function setIban(string $iban)
+    {
+        // TODO: Mit Andi Die Lib verwenden
+        if (empty($iban)) {
+            throw new WrongTextFormatException("Error: The Iban is not allowed to be empty.");
+        }
+        if (strlen($iban) > 34) {
+            throw new WrongTextFormatException("Error: The Iban is not allowed to be Greater then 34 chars.");
+        }
+        $this->iban = $iban;
+        return $this;
+    }
+    //TODO: Amount länge einstellen.
+    public function setAmount(string $amount)
+    {
+        
+        $value = substr($amount, 3);
+        if (strlen($value) > 34) {
+            throw new WrongCurrencyFormatException("Error: The Currenzy is not allowed to be greater then 34 Byte.");
+        }
+        //Here is the check if it has a "," seperator or a currency seperator
+        if (!is_numeric($value)) {
+            throw new WrongCurrencyFormatException("Error: The Currency is not right or it has the wrong seperator use "
+                    . "this seperator: .");
+        }
+
+        //NOT ALLOWED .0 .12 ...
+        if ($value[0] == ".") {
+            throw new WrongCurrencyFormatException("Error: Leading zero is required for amounts below 1 EUR.");
+        }
+        //NOT ALLOWED 00123.3 01.223 00000011 ....
+        if ($value[0] == 0 && $value[1] != '.') {
+            throw new WrongCurrencyFormatException("Error: There are no Zeros allowed Before the Euro Index");
+        }
+        //NOT ALLOWED 123.30 45.0
+        if (strpos($value, '.') !== false && $value[strlen($value) - 1] == 0) {
+            throw new WrongCurrencyFormatException("Error: There are no Zeros allowed at the end at The Currency");
+        }
+
+        if ($value[strlen($value) - 1] == '.') {
+            throw new WrongCurrencyFormatException("Error: There is no Seperation operator allowed at the end.");
+        }
+
+        if ($value <= 0) {
+            throw new WrongCurrencyFormatException("Error: Currency Amount is too low");
+        }
+
+        if ($value > 999999999.99) {
+            throw new WrongCurrencyFormatException("Error: Currency Amount is greater as 999 999 999,99 Euro");
+        }
+        $this->amount = $amount;
+        return $this;
+    }
+    public function setPaymentReference(string $ref)
+    {
+        if (empty($ref)) {
+            throw new WrongTextFormatException("Error: The PaymentReference is not allowed to be Empty.");
+        }
+        if (strlen($ref) > 35) {
+            throw new WrongTextFormatException("Error: The PaymentReference is not allowed to be greater "
+                    . "then 35 Byte.");
+        }
+           $this->paymentReference = $ref;
+        return $this;
+    }
+    public function setReasonForPayment(string $rfp)
+    {
+        if (empty($rfp)) {
+            //Reason for Payment is Optional
+            return;
+        }
+        if (mb_strlen($rfp) > 140) {
+            throw new WrongTextFormatException("Error: The Reason for Payment is not allowed to be "
+                    . "longer then 140 Chars.");
+        }
+         $this->reasonForPayment = $rfp;
+        return $this;
+    }
         // </editor-fold>
         
     // <editor-fold defaultstate="collapsed" desc="Getter">
-       public function getVersion(){
-           return $this ->version;
-       }
-       public function getDecodingNumber(){
-           return $this-> decodingNumber;
-       }
-       public function getCreditTransferMethod(){
-           return $this ->creditTransferMethod;
-       }
-       public function getBankIdentifierCode(){
-           return $this ->bankIdentifierCode;
-       }
-       public function getRecieverName(){
-           return $this ->recieverName;
-       }
-       public function getIban(){
-           return $this ->iban;
-       }
-       public function getAmount(){
-           return $this ->amount;
-       }
-       public function getPaymentReference(){
-           return $this ->paymentReference;
-       }
-       public function getReasonForPayment(){
-           return $this ->reasonForPayment;
-       }
+    public function getVersion()
+    {
+        return $this ->version;
+    }
+    public function getDecodingNumber()
+    {
+        return $this-> decodingNumber;
+    }
+    public function getCreditTransferMethod()
+    {
+        return $this ->creditTransferMethod;
+    }
+    public function getBankIdentifierCode()
+    {
+        return $this ->bankIdentifierCode;
+    }
+    public function getRecieverName()
+    {
+        return $this ->recieverName;
+    }
+    public function getIban()
+    {
+        return $this ->iban;
+    }
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+    public function getPaymentReference()
+    {
+        return $this ->paymentReference;
+    }
+    public function getReasonForPayment()
+    {
+        return $this ->reasonForPayment;
+    }
     // </editor-fold>
 }

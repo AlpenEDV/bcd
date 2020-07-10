@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 use Alpenedv\Tools\Bcd\Bill;
 use Alpenedv\Tools\Bcd\Exception\WrongCurrencyFormatException;
+use Alpenedv\Tools\Bcd\Exception\WrongVersionException;
+use Alpenedv\Tools\Bcd\Exception\WrongNumberException;
+use Alpenedv\Tools\Bcd\Exception\WrongTextFormatException;
 
 class BillTest extends TestCase
 {
@@ -16,7 +19,130 @@ class BillTest extends TestCase
         $bill = new Bill();
         $bill->setAmount('EUR12x345');
     }
+    public function testValidVerisonNumber1(){
+       
+         $bill = new Bill();
+        $bill->setVersion(Bill::VERSION_1);
+        $this->assertSame(Bill::VERSION_1, $bill->getVersion());
+    }
+    public function testValidVerisonNumber2(){
+       
+         $bill = new Bill();
+        $bill->setVersion(Bill::VERSION_2);
+        $this->assertSame(Bill::VERSION_2, $bill->getVersion());
+    }
+    public function testInValidVerisonNumber(){
+       
+        $this->expectException(WrongVersionException::class);
+         $bill = new Bill();
+        $bill->setVersion(3);
+       
+    }
+    public function testValidDecodingNumberUsingUtf8(){
+       
+         $bill = new Bill();
+        $bill->setDecodingNumber(Bill::ENCODING_UTF8);
+        $this->assertSame(Bill::ENCODING_UTF8, $bill->getDecodingNumber());
+    }
+    public function testValidDecodingNumberUsing1(){
+       
+         $bill = new Bill();
+        $bill->setDecodingNumber(1);
+        $this->assertSame(1, $bill->getDecodingNumber());
+    }
+    public function testInValidDecodingNumber(){
+       
+        $this->expectException(WrongNumberException::class);
+         $bill = new Bill();
+        $bill->setDecodingNumber(3);
+       
+    }
+    public function testValidCreditTransferMethod(){
+       
+         $bill = new Bill();
+        $bill->setCreditTransferMethod(Bill::SCT);
+        $this->assertSame(Bill::SCT, $bill->getCreditTransferMethod());
+    }
+     public function testInValidCreditTransferMehod(){
+       
+        $this->expectException(WrongTextFormatException::class);
+         $bill = new Bill();
+        $bill->setCreditTransferMethod("ACD");
+    }
+    public function testValidBankIdentiferCode8Byte(){
+        $bill = new Bill();
+        $bic= "z37c5387";
+        $bill->setVersion(Bill::VERSION_1)
+        ->setBankIdentiferCode($bic);
+        $this->assertSame($bic,$bill->getBankIdentifierCode());
+    }
+    public function testValidBankIdentiferCode11Byte(){
+        $bill = new Bill();
+        $bic= "z37c5387jt1";
+        $bill->setVersion(Bill::VERSION_1)
+        ->setBankIdentiferCode($bic);
+         
+        $this->assertSame($bic,$bill->getBankIdentifierCode());
+    }
     
+    public function testInvalidBankIdentiferCodewhereversionisnotGiven(){
+        $bill = new Bill();
+        $this->expectException(WrongTextFormatException::class);
+        $bill->setBankIdentiferCode("z37c53872");
+    }
+    public function testInvalidBankIdentiferCodewhereversionis1butBicisnotGiven(){
+        $bill = new Bill();
+        $this->expectException(WrongTextFormatException::class);
+        $bill->setVersion(Bill::VERSION_1);
+        $bill ->setBankIdentiferCode("");
+    }
+    public function testValidRecieverName(){
+       
+         $bill = new Bill();
+        $bill->setRecieverName("Helmiut Müller");
+        $this->assertSame("Helmiut Müller", $bill->getRecieverName());
+    }
+     public function testInValidRecieverNameWhereNameisToLong(){
+       
+        $this->expectException(WrongTextFormatException::class);
+         $bill = new Bill();
+        $bill->setRecieverName("ACDkjjmjhvahsvdjhavjhfgajhgf jhqabvjhavkhfkbakjfbakjabkjfbakjbakfbkjabf");
+    }
+     public function testInValidRecieverNameWhereNameisempty(){
+       
+        $this->expectException(WrongTextFormatException::class);
+         $bill = new Bill();
+        $bill->setRecieverName("");
+    }
+    public function testValidIban(){
+       
+         $bill = new Bill();
+        $bill->setIban("AT932236200123456789");
+        $this->assertSame("AT932236200123456789", $bill->getIban());
+    }
+     public function testInValidIbanWhereIbanisToLong(){
+       
+        $this->expectException(WrongTextFormatException::class);
+         $bill = new Bill();
+        $bill->setIban("AT93223620012345678987287634872873654872676236487");
+    }
+     public function testInValidIbanWhereIbanisempty(){
+       
+        $this->expectException(WrongTextFormatException::class);
+         $bill = new Bill();
+        $bill->setIban("");
+    }
+    public function testValidReasonForPayment(){
+        $bill = new Bill();
+        $bill->setReasonForPayment("Du Andi Ich bin glaube ich fertig mit dem Testen");
+        $this->assertSame("Du Andi Ich bin glaube ich fertig mit dem Testen", $bill->getReasonForPayment());
+    }
+    public function testInvalidReasonForPaymentwhererfpistolong() {
+        $this->expectException(WrongTextFormatException::class);
+         $bill = new Bill();
+        $bill->setReasonForPayment("hgaahhahhahsfdapokfajnfkjhabzfguzgauzgdqiuwhdoijqpokcomakjncjhwagfuztgasbfdnkjahoifhqiuagwiuzrgakjnfuazuzfgaihfpoiquoinakjsncjahiuzgrfancjkpoakduqanwlma"
+                . "pock8zqarfiunalkkf9aurzannnnn,h");
+    }
     /**
      * @param string $amount
      * 
@@ -28,6 +154,7 @@ class BillTest extends TestCase
         $bill->setAmount($amount);
         $this->assertSame($amount, $bill->getAmount());
     }
+    
     
     /**
      * @param string $amount

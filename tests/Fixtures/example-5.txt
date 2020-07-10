@@ -1,0 +1,12 @@
+BCD
+002
+1
+SCT
+
+35 Zeichen langer Empfängername zum
+XX17LandMitLangerIBAN2345678901234
+EUR12345689.01
+
+35ZeichenLangeREFzurZuordnungBeimBe
+
+Netter Text für den Zahlenden, damit dieser weiß, was er zahlt und auc
