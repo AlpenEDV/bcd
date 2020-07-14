@@ -1,6 +1,6 @@
 {
-    "name": "edunareanu/test",
-    "description": "Description of project PhpTestProjekt1.",
+    "name": "alpenedv/bcd",
+    "description": "BCD Payment-QR-Code",
     "authors": [
         {
             "name": "Eduard Dunareanu",
@@ -8,13 +8,14 @@
         }
     ],
     "require": {
-        "tecnickcom/tcpdf": "6.3.*",
-        "symfony/validator": "dev-master"
-        
+        "php": ">= 7.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.5"
-        
+        "phpunit/phpunit": "^7.5",
+        "tecnickcom/tcpdf": "6.3.*"
+    },
+    "suggest": {
+        "tecnickcom/tcpdf": "To create QR code PDFs"
     },
     "autoload": {
         "psr-4": {

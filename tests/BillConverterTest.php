@@ -3,11 +3,11 @@
 namespace Alpenedv\Tools\Bcd\Tests;
 
 use PHPUnit\Framework\TestCase;
-
 use Alpenedv\Tools\Bcd\Bill;
 use Alpenedv\Tools\Bcd\BillToStringConverter;
 use Alpenedv\Tools\Bcd\Exception\WrongCurrencyFormatException;
 use Alpenedv\Tools\Bcd\Exception\WrongNumberException;
+use Alpenedv\Tools\Bcd\Exception\WrongTextFormatException;
 
 class BillToStringConverterTest extends TestCase
 {
@@ -21,7 +21,7 @@ class BillToStringConverterTest extends TestCase
         $bill->setDecodingNumber(Bill::ENCODING_UTF8);
         $bill->setCreditTransferMethod(Bill::SCT);
         $bill->setBankIdentiferCode('GIBAATWW');
-        $bill->setRecieverName('Max Mustermann');
+        $bill->setReceiverName('Max Mustermann');
         $bill->setIban('AT682011131032423628');
         $bill->setAmount('EUR1456.89');
         $bill->setPaymentReference('457845789452');
@@ -42,7 +42,7 @@ class BillToStringConverterTest extends TestCase
         $bill->setVersion(Bill::VERSION_2);
         $bill->setDecodingNumber(Bill::ENCODING_UTF8);
         $bill->setCreditTransferMethod(Bill::SCT);
-        $bill->setRecieverName('Umbrella Corp.');
+        $bill->setReceiverName('Umbrella Corp.');
         $bill->setIban('AT932236200123456789');
         $bill->setAmount('EUR1337.99');
         $bill->setPaymentReference('R2020/1938');
@@ -62,7 +62,7 @@ class BillToStringConverterTest extends TestCase
         $bill->setDecodingNumber(2);
         $bill->setCreditTransferMethod(Bill::SCT);
         $bill->setBankIdentiferCode('GENODEF1KIL');
-        $bill->setRecieverName('Max Mustermann');
+        $bill->setReceiverName('Max Mustermann');
         $bill->setIban('DE52210900070088299309');
         $bill->setAmount('EUR1456.89');
         $bill->setPaymentReference('457845789452');
@@ -77,7 +77,7 @@ class BillToStringConverterTest extends TestCase
         $bill->setDecodingNumber(1);
         $bill->setCreditTransferMethod(Bill::SCT);
         $bill->setBankIdentiferCode('BICVXXDD123');
-        $bill->setRecieverName('35 Zeichen langer Empfängername zum');
+        $bill->setReceiverName('35 Zeichen langer Empfängername zum');
         $bill->setIban('XX17LandMitLangerIBAN2345678901234');
         $bill->setAmount('EUR12345689.01');
         $bill->setPaymentReference('35ZeichenLangeREFzurZuordnungBeimBe');
@@ -95,7 +95,7 @@ class BillToStringConverterTest extends TestCase
         $bill->setDecodingNumber(1);
         $bill->setCreditTransferMethod(Bill::SCT);
         $bill->setBankIdentiferCode('GIBAATWW');
-        $bill->setRecieverName('Max Mustermann');
+        $bill->setReceiverName('Max Mustermann');
         $bill->setIban('AT682011131032423628');
         $bill->setAmount('EUR1456.89');
         $bill->setPaymentReference('457845789452');
@@ -112,7 +112,7 @@ class BillToStringConverterTest extends TestCase
         $bill->setVersion(Bill::VERSION_2);
         $bill->setDecodingNumber(1);
         $bill->setCreditTransferMethod(Bill::SCT);
-        $bill->setRecieverName('35 Zeichen langer Empfängername zum');
+        $bill->setReceiverName('35 Zeichen langer Empfängername zum');
         $bill->setIban('XX17LandMitLangerIBAN2345678901234');
         $bill->setAmount('EUR12345689.01');
         $bill->setPaymentReference('35ZeichenLangeREFzurZuordnungBeimBe');
@@ -122,5 +122,43 @@ class BillToStringConverterTest extends TestCase
         
         $converter = new BillToStringConverter();
         $this->assertSame($expected, $converter->convert($bill));
+    }
+    public function testConvertExample6()
+    {
+        $bill = new Bill();
+        $bill->setVersion(Bill::VERSION_2);
+        $bill->setDecodingNumber(1);
+        $bill->setCreditTransferMethod(Bill::SCT);
+        $bill->setBankIdentiferCode('GIBAATWW');
+        $bill->setReceiverName('35 Zeichen langer Empfängername zum');
+        $bill->setIban('XX17LandMitLangerIBAN2345678901234');
+        $bill->setAmount('EUR12345689.01');
+        $bill->setPaymentReference('35ZeichenLangeREFzurZuordnungBeimBe');
+        $bill->setReasonForPayment('Netter Text für den Zahlenden, damit dieser weiß, was er zahlt und auc');
+        $bill->setUserNote('Danke Für ihren Einkauf.');
+        
+        $expected = file_get_contents(__DIR__ . '/Fixtures/example-6.txt');
+        
+        $converter = new BillToStringConverter();
+        $this->assertSame($expected, $converter->convert($bill));
+    }
+    public function testConvertTooLongString()
+    {
+        
+        $bill = new Bill();
+        $bill->setVersion(Bill::VERSION_1);
+        $bill->setDecodingNumber(1);
+        $bill->setCreditTransferMethod(Bill::SCT);
+        $bill->setBankIdentiferCode('GIBAATWWXXX');
+        $bill->setReceiverName(str_repeat('X', 70));
+        $bill->setIban('XX17LandMitLangerIBAN2345678901234');
+        $bill->setAmount('EUR999999999.99');
+        $bill->setPaymentReference('35ZeichenLangeREFzurZuordnungBeimBe');
+        $bill->setReasonForPayment(str_repeat('X', 140));
+        $bill->setUserNote(str_repeat('X', 70));
+        
+      
+        $this->expectException(WrongTextFormatException::class);
+        $converter = (new BillToStringConverter())->convert($bill);
     }
 }

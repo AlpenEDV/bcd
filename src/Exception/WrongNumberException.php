@@ -18,6 +18,6 @@ use Exception;
  */
 class WrongNumberException extends Exception{
      public function Message(){
-        return $errorMsg= 'Error: The Decoding Number '.$this->getMessage().'is not valid;';
+        return $errorMsg=$this->Message();
     }
 }

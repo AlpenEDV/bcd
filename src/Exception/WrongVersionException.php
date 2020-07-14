@@ -18,6 +18,6 @@ use Exception;
  */
 class WrongVersionException extends Exception{
     public function Message(){
-        return $errorMsg= 'Error the Version Number '.$this->getMessage().'is not vaild';
+        return $errorMsg=$this->getMessage();
     }
 }
