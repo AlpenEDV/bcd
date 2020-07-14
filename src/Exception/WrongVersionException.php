@@ -17,7 +17,4 @@ use Exception;
  * @author eduard
  */
 class WrongVersionException extends Exception{
-    public function Message(){
-        return $errorMsg=$this->getMessage();
-    }
 }

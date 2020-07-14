@@ -237,7 +237,7 @@ class Bill
     {
         return $this ->paymentReference;
     }
-    public function getReasonForPayment(): string
+    public function getReasonForPayment(): ?string
     {
         return $this ->reasonForPayment;
     }

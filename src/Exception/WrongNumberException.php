@@ -17,7 +17,4 @@ use Exception;
  * @author eduard
  */
 class WrongNumberException extends Exception{
-     public function Message(){
-        return $errorMsg=$this->Message();
-    }
 }

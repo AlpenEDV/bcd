@@ -17,7 +17,4 @@ use Exception;
  * @author eduard
  */
 class WrongCurrencyFormatException extends Exception{
-    public function Message(){
-        return $errorMsg=$this->getMessage();
-    }
 }
