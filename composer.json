@@ -1,10 +1,20 @@
 {
     "name": "alpenedv/bcd",
     "description": "BCD Payment-QR-Code",
+    "type": "library",
+    "license": "LGPL-3.0-only",
+    "homepage": "https://github.com/AlpenEDV/bcd",
+    "support": {
+        "issues": "https://github.com/AlpenEDV/bcd/issues"
+    },
     "authors": [
         {
             "name": "Eduard Dunareanu",
             "email": "eduard@alpenedv.at"
+        },
+        {
+            "name": "Andreas Erhard",
+            "email": "andreas@alpenedv.at"
         }
     ],
     "require": {
