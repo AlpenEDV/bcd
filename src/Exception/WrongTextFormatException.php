@@ -1,8 +1,8 @@
 <?php
 
 /*
- * BCD -Payment Qr Code Generation 
- * 
+ * BCD -Payment Qr Code Generation
+ *
  * @copyright (c) AlpenEDV
  * @author Eduard Duanreanu <eduard@alpenedv.at>
  */
@@ -16,5 +16,6 @@ use Exception;
  *
  * @author eduard
  */
-class WrongTextFormatException extends Exception{
+class WrongTextFormatException extends Exception
+{
 }
