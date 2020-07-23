@@ -24,10 +24,10 @@ class Bill
     public const VERSION_2 = '002';
     public const SCT = 'SCT';
     public const ENCODING_UTF8 = 1;
-    
-    private $version;
-    private $decodingNumber;
-    private $creditTransferMethod;
+
+    private $version = self::VERSION_2;
+    private $decodingNumber = self::ENCODING_UTF8;
+    private $creditTransferMethod = self::SCT;
     private $bankIdentifierCode;
     private $receiverName;
     private $iban;
@@ -35,9 +35,9 @@ class Bill
     private $paymentReference;
     private $reasonForPayment;
     private $userNote;
-    
+
     // <editor-fold defaultstate="collapsed" desc="Setter">
-   
+
     public function setVersion(string $version)
     {
         if ($version === self::VERSION_1 || $version === self::VERSION_2) {
@@ -68,27 +68,23 @@ class Bill
     }
     public function setBankIdentiferCode(string $bic)
     {
-        if (is_null($this->version)) {
-            throw new WrongTextFormatException('Before setting the Bank Identifier Code please set the Verisonnumber.');
-        }
-        
         if (!empty($bic) && strlen($bic) !== 8 && strlen($bic) !== 11) {
             throw new WrongTextFormatException('Bank Identifier Code is not 8 Byte long or 11 Byte long.');
         }
-        
+
         if ($this->version === self::VERSION_2 && !empty($bic)) {
             $this->bankIdentifierCode = $bic;
-            
+
             return $this;
         }
 
         if (empty($bic)) {
             throw new WrongTextFormatException('Bank Identifer Code is Not allowed to be empty in Version 001 current '
-                    . 'version' . $this->version);
+                    . 'version ' . $this->version);
         }
-        
+
         $this->bankIdentifierCode = $bic;
-        
+
         return $this;
     }
     public function setReceiverName(string $name)
@@ -102,7 +98,7 @@ class Bill
         }
 
         $this->receiverName = $name;
-        
+
         return $this;
     }
     public function setIban(string $iban)
@@ -115,7 +111,7 @@ class Bill
             throw new WrongTextFormatException('Error: The Iban is not allowed to be longer then 34 chars.');
         }
         $this->iban = $iban;
-        
+
         return $this;
     }
     //Invalid see: Page 6
@@ -159,7 +155,7 @@ class Bill
             throw new WrongCurrencyFormatException('Error: Currency Amount is greater as 999 999 999,99 Euro');
         }
         $this->amount = $amount;
-        
+
         return $this;
     }
     public function setPaymentReference(string $ref)
@@ -172,7 +168,7 @@ class Bill
                     . 'then 35 Byte.');
         }
         $this->paymentReference = $ref;
-           
+
         return $this;
     }
     public function setReasonForPayment(string $rfp)
@@ -186,7 +182,7 @@ class Bill
                     . 'longer then 140 Chars.');
         }
         $this->reasonForPayment = $rfp;
-         
+
         return $this;
     }
     public function setUserNote(string $note)
@@ -199,11 +195,11 @@ class Bill
             throw new WrongTextFormatException('Error: User Note is not allowed to be longer then 70 Chars.');
         }
         $this->userNote = $note;
-         
+
         return $this;
     }
         // </editor-fold>
-        
+
     // <editor-fold defaultstate="collapsed" desc="Getter">
     public function getVersion(): ?string
     {
