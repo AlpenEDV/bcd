@@ -114,7 +114,7 @@ class BillTest extends TestCase
         $bill = new Bill();
         $bill->setVersion(Bill::VERSION_1);
         $this->expectException(WrongTextFormatException::class);
-        $this->expectExceptionMessage('Bank Identifer Code is Not allowed to be empty in Version 001 current version '
+        $this->expectExceptionMessage('Bank Identifer Code is not allowed to be empty in Version 001 current version '
                 . $bill->getVersion());
         $bill->setBankIdentiferCode('');
     }

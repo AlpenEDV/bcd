@@ -43,14 +43,14 @@ class Bill
         if ($version === self::VERSION_1 || $version === self::VERSION_2) {
             $this->version = $version;
         } else {
-            throw new WrongVersionException('Error the Version Number ' . $version . 'is not vaild');
+            throw new WrongVersionException('Error the Version Number ' . $version . ' is not valid');
         }
         return $this;
     }
     public function setDecodingNumber(int $decodingNumber)
     {
         if ($decodingNumber !== 1) {
-            throw new WrongNumberException('Error: The Decoding Number ' . $decodingNumber . 'is not valid;');
+            throw new WrongNumberException('Error: The Decoding Number ' . $decodingNumber . ' is not valid;');
         }
         $this->decodingNumber = $decodingNumber;
 
@@ -61,7 +61,7 @@ class Bill
         if ($creditTransferMethod === self::SCT) {
             $this->creditTransferMethod = $creditTransferMethod;
         } else {
-            throw new WrongTextFormatException($creditTransferMethod . ' is not a vaild TransferMethod;');
+            throw new WrongTextFormatException($creditTransferMethod . ' is not a valid TransferMethod;');
         }
 
         return $this;
@@ -79,7 +79,7 @@ class Bill
         }
 
         if (empty($bic)) {
-            throw new WrongTextFormatException('Bank Identifer Code is Not allowed to be empty in Version 001 current '
+            throw new WrongTextFormatException('Bank Identifer Code is not allowed to be empty in Version 001 current '
                     . 'version ' . $this->version);
         }
 
@@ -90,11 +90,11 @@ class Bill
     public function setReceiverName(string $name)
     {
         if (empty($name)) {
-            throw new WrongTextFormatException('Error: The Reciever Name is not allowed to be empty.');
+            throw new WrongTextFormatException('Error: The Receiver Name is not allowed to be empty.');
         }
         // mb_strlen == characters, strlen == bytes
         if (mb_strlen($name) > 70) {
-            throw new WrongTextFormatException('Error: The Reciever Name is not allowed to be geater then 70 chars.');
+            throw new WrongTextFormatException('Error: The Receiver Name is not allowed to be longer than 70 chars.');
         }
 
         $this->receiverName = $name;
@@ -104,11 +104,11 @@ class Bill
     public function setIban(string $iban)
     {
         if (empty($iban)) {
-            throw new WrongTextFormatException('Error: The Iban is not allowed to be empty.');
+            throw new WrongTextFormatException('Error: The IBAN is not allowed to be empty.');
         }
 
         if (strlen($iban) > 34) {
-            throw new WrongTextFormatException('Error: The Iban is not allowed to be longer then 34 chars.');
+            throw new WrongTextFormatException('Error: The IBAN is not allowed to be longer than 34 chars.');
         }
         $this->iban = $iban;
 
@@ -119,7 +119,7 @@ class Bill
     {
         $value = substr($amount, 3);
         if (strlen($amount) > 34) {
-            throw new WrongCurrencyFormatException('Error: The Currency is not allowed to be greater then 34 Byte.');
+            throw new WrongCurrencyFormatException('Error: The Currency is not allowed to be longer than 34 Bytes.');
         }
 
         //Here is the check if it has a ',' seperator or a currency seperator
@@ -140,7 +140,7 @@ class Bill
 
         //NOT ALLOWED 123.30 45.0
         if (strpos($value, '.') !== false && $value[strlen($value) - 1] === '0') {
-            throw new WrongCurrencyFormatException('Error: There are no zeros allowed at the end at The Currency');
+            throw new WrongCurrencyFormatException('Error: There are no zeros allowed at the end of the Currency');
         }
 
         if ($value[strlen($value) - 1] === '.') {
@@ -165,7 +165,7 @@ class Bill
         }
         if (strlen($ref) > 35) {
             throw new WrongTextFormatException('Error: The PaymentReference is not allowed to be longer '
-                    . 'then 35 Byte.');
+                    . 'than 35 Bytes.');
         }
         $this->paymentReference = $ref;
 
@@ -179,7 +179,7 @@ class Bill
         }
         if (mb_strlen($rfp) > 140) {
             throw new WrongTextFormatException('Error: The Reason for Payment is not allowed to be '
-                    . 'longer then 140 Chars.');
+                    . 'longer than 140 Chars.');
         }
         $this->reasonForPayment = $rfp;
 
@@ -192,7 +192,7 @@ class Bill
             return $this;
         }
         if (mb_strlen($note) > 70) {
-            throw new WrongTextFormatException('Error: User Note is not allowed to be longer then 70 Chars.');
+            throw new WrongTextFormatException('Error: User Note is not allowed to be longer than 70 Chars.');
         }
         $this->userNote = $note;
 
